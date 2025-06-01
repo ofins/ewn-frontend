@@ -19,15 +19,14 @@ const Login = () => {
           email: variables.email,
           password: variables.password,
         }),
-      }).then((res) => {
+      }).then(async (res) => {
         if (!res.ok) throw new Error("Login failed");
-        // const data = res.json();
-
-        // localStorage.setItem("token", token || "");
+        const data = await res.json();
+        // Optionally save token here if your API returns it in the body:
+        localStorage.setItem("token", data.token || "");
+        console.log("Login successful:", data);
+        return data;
       }),
-    onSuccess: (data) => {
-      console.log(data);
-    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
