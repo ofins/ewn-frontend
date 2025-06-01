@@ -1,37 +1,38 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-const API_BASE_URL = "http://localhost:3000";
-
-const loginUser = async ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) => {
-  // Replace with your actual API endpoint
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!response.ok) {
-    throw new Error("Login failed");
-  }
-  return response.json();
-};
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const mutation = useMutation({
-    mutationFn: loginUser,
+    mutationFn: (variables: {
+      endpoint: string;
+      email: string;
+      password: string;
+    }) =>
+      fetch(`${import.meta.env.VITE_API_BASE_URL}/${variables.endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: variables.email,
+          password: variables.password,
+        }),
+      }).then((res) => {
+        if (!res.ok) throw new Error("Login failed");
+        // const data = res.json();
+
+        // localStorage.setItem("token", token || "");
+      }),
+    onSuccess: (data) => {
+      console.log(data);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({ email, password });
+    mutation.mutate({ endpoint: "auth/login", email, password });
   };
 
   return (
